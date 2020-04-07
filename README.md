@@ -1,6 +1,6 @@
-# conversormoedas
+# Dólar agora
 
-A new Flutter application.
+Conversor de moedas, desenvolvido em Flutter. 
 
 ## Getting Started
 
