@@ -15,7 +15,7 @@ void main() async {
       primaryColor: Colors.black,
       inputDecorationTheme: InputDecorationTheme(
         enabledBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blueGrey)),
+              OutlineInputBorder(borderSide: BorderSide(color: Colors.blueGrey), ),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.deepOrangeAccent)),
         hintStyle: TextStyle(color: Colors.black),
@@ -40,6 +40,41 @@ class _HomeState extends State<Home> {
   final euroController =  TextEditingController();
   double dollar;
   double euro;
+
+  void _clearAll(){
+    realController.text = "";
+    dollarController.text = "";
+    euroController.text = "";
+  }
+
+  void _realChanged(String text) {
+    if(text.isEmpty) {
+      _clearAll();
+          return;
+    }
+    double real = double.parse(text);
+    dollarController.text = (real/dollar).toStringAsFixed(2);
+    euroController.text = (real/euro).toStringAsFixed(2);
+  }
+  void _dollarChanged(String text) {
+    if(text.isEmpty) {
+      _clearAll();
+      return;
+    }
+    double dollar = double.parse(text);
+    realController.text = (dollar * this.dollar).toStringAsFixed(2);
+    euroController.text = (dollar * this.dollar / euro).toStringAsFixed(2);
+}
+  void _euroChanged(String text) {
+    if(text.isEmpty) {
+      _clearAll();
+      return;
+    }
+    double euro = double.parse(text);
+    realController.text = (euro * this.euro).toStringAsFixed(2);
+    dollarController.text = (euro * this.euro / dollar).toStringAsFixed(2);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +111,7 @@ class _HomeState extends State<Home> {
                   dollar = snapshot.data["results"]["currencies"]["USD"]["buy"];
                   euro = snapshot.data["results"]["currencies"]["EUR"]["buy"];
                   return SingleChildScrollView(
-                    padding: EdgeInsets.all(10.0),
+                    padding: EdgeInsets.all(20.0),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
@@ -85,11 +120,11 @@ class _HomeState extends State<Home> {
                             size: 150.0,
                             color: Colors.deepOrangeAccent,
                           ),
-                          buildTextField("Reais", "R\$"),
+                          buildTextField("Reais", "R\$", realController, _realChanged),
                           Divider(),
-                          buildTextField("Dólares", "US\$"),
+                          buildTextField("Dólares", "US\$", dollarController, _dollarChanged),
                           Divider(),
-                          buildTextField("Euros", "€"),
+                          buildTextField("Euros", "€", euroController, _euroChanged),
                         ]),
                   );
                 }
@@ -99,8 +134,9 @@ class _HomeState extends State<Home> {
   }
 }
 
-Widget buildTextField(label, prefix) {
+Widget buildTextField(label, prefix, TextEditingController controller, Function onchanged) {
   return TextField(
+    controller: controller,
     decoration: InputDecoration(
       labelText: label,
       labelStyle: TextStyle(color: Colors.black),
@@ -108,5 +144,7 @@ Widget buildTextField(label, prefix) {
       prefixText: prefix,
     ),
     style: TextStyle(color: Colors.black, fontSize: 25.0),
+    onChanged: onchanged ,
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
   );
 }
